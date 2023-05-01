@@ -25,7 +25,7 @@ public class LabelBl {
 
     public LabelDto getLabelById(Integer id) {
 
-        //Buscamos el elemento en la lista
+        // Buscamos el elemento en la lista
         LabelDto label = labels.stream()
                 .filter(t -> t.getLabelId().equals(id))
                 .findFirst()
@@ -33,8 +33,8 @@ public class LabelBl {
         return label;
     }
 
-    public LabelDto updateLabelById(Integer idLabel,  LabelDto newLabel) {
-        //Buscamos el elemento en la lista
+    public LabelDto updateLabelById(Integer idLabel, LabelDto newLabel) {
+        // Buscamos el elemento en la lista
         LabelDto label = labels.stream()
                 .filter(t -> t.getLabelId().equals(idLabel))
                 .findFirst()
@@ -44,7 +44,7 @@ public class LabelBl {
     }
 
     public void createLabel(LabelDto label) {
-        // Obtenemos el ultimo elemento de la lista  y le sumamos 1 para obtener el id
+        // Obtenemos el ultimo elemento de la lista y le sumamos 1 para obtener el id
         // del nuevo elemento
         if (labels.size() > 0) {
             LabelDto lastLabel = labels.get(labels.size() - 1);

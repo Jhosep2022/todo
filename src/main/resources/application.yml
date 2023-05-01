@@ -1,7 +1,9 @@
 server:
   port: 9999
-  profiles:
-    active: chaos-monkey
+
+#spring:
+# profiles:
+#   active: chaos-monkey
 
 chaos:
   monkey:

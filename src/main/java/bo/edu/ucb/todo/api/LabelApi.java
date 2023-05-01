@@ -5,6 +5,8 @@ import bo.edu.ucb.todo.bl.LabelBl;
 import bo.edu.ucb.todo.dto.LabelDto;
 import bo.edu.ucb.todo.dto.ResponseDto;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +27,7 @@ public class LabelApi {
      * @return
      */
     @GetMapping("/api/v1/label")
-    public ResponseDto<List<LabelDto>> getAllLabels(
+    public ResponseEntity< ResponseDto<List<LabelDto>>> getAllLabels(
             @RequestHeader("Authorization") String token) {
         AuthBl authBl = new AuthBl();
         if (!authBl.validateToken(token)) {
@@ -33,12 +35,12 @@ public class LabelApi {
             response.setCode("0001");
             response.setResponse(null);
             response.setErrorMessage("Invalid token");
-            return response;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         ResponseDto<List<LabelDto>> response = new ResponseDto<>();
         response.setCode("0000");
         response.setResponse(this.labelBl.getAllLabels());
-        return response;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -48,14 +50,14 @@ public class LabelApi {
      * @return
      */
     @GetMapping("/api/v1/label/{idLabel}")
-    public ResponseDto<LabelDto> getLabelById(@PathVariable("idLabel") Integer id, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<ResponseDto<LabelDto>> getLabelById(@PathVariable("idLabel") Integer id, @RequestHeader("Authorization") String token) {
         ResponseDto<LabelDto> response = new ResponseDto<>();
         AuthBl authBl = new AuthBl();
         if (!authBl.validateToken(token)) {
             response.setCode("0001");
             response.setResponse(null);
             response.setErrorMessage("Invalid token");
-            return response;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         //Buscamos el elemento en la lista
         LabelDto label = this.labelBl.getLabelById(id);
@@ -65,12 +67,12 @@ public class LabelApi {
             response.setCode("0001");
             response.setResponse(null);
             response.setErrorMessage("Label not found");
-            return response;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } else {
             // Si existe retornamos el elemento
             response.setCode("0000");
             response.setResponse(label);
-            return response;
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
 
@@ -82,14 +84,14 @@ public class LabelApi {
      * @return
      */
     @PutMapping("/api/v1/label/{idLabel}")
-    public ResponseDto<LabelDto> updateLabelById( @PathVariable Integer idLabel, @RequestBody LabelDto newLabel, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<ResponseDto<LabelDto>> updateLabelById( @PathVariable Integer idLabel, @RequestBody LabelDto newLabel, @RequestHeader("Authorization") String token) {
         ResponseDto<LabelDto> response = new ResponseDto<>();
         AuthBl authBl = new AuthBl();
         if (!authBl.validateToken(token)) {
             response.setCode("0001");
             response.setResponse(null);
             response.setErrorMessage("Invalid token");
-            return response;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         //Buscamos el elemento en la lista
         LabelDto label = this.labelBl.getLabelById(idLabel);
@@ -99,13 +101,13 @@ public class LabelApi {
             response.setCode("0001");
             response.setResponse(null);
             response.setErrorMessage("Label not found");
-            return response;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } else {
             this.labelBl.updateLabelById(idLabel, newLabel);
             // Si existe retornamos el elemento
             response.setCode("0000");
             response.setResponse(label);
-            return response;
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
 
@@ -116,18 +118,24 @@ public class LabelApi {
      * @return Retorna un mensaje: "Label createed" o error en su defecto.
      */
     @PostMapping("/api/v1/label")
-    public ResponseDto<String> createLabel(@RequestBody LabelDto label, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<ResponseDto<String>> createLabel(@RequestBody LabelDto label, @RequestHeader("Authorization") String token) {
         ResponseDto<String> response = new ResponseDto<>();
         AuthBl authBl = new AuthBl();
         if (!authBl.validateToken(token)) {
             response.setCode("0001");
             response.setResponse(null);
             response.setErrorMessage("Invalid token");
-            return response;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+        if (label.getName() == null || label.getName().trim().equals("")) {
+            response.setCode("0002");
+            response.setResponse(null);
+            response.setErrorMessage("Label name is required");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         this.labelBl.createLabel(label);
         response.setCode("0000");
         response.setResponse("Label created");
-        return response;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
